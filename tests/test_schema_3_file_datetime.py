@@ -49,14 +49,12 @@ def dataset_record(datetime_metadata):
                 "dataset_file_data_state": "raw",
                 "dataset_file_preprocessing": {
                     "dataset_file_preprocessing_bol": False,
-                    "dataset_file_preprocessing_desc": None,
                 },
                 "dataset_file_variables": [
                     {
                         "dataset_file_variables_name": "timestamp",
                         "dataset_file_variables_labels": "Timestamp",
                         "dataset_file_variables_type": "string",
-                        "dataset_file_variables_calibration": None,
                         "dataset_file_variables_term": {
                             "variable_term": "other",
                             "variable_name": "timestamp",
@@ -83,8 +81,6 @@ class Schema3FileDatetimeTests(unittest.TestCase):
                 "dataset_file_datetime_source": "column",
                 "dataset_file_datetime_date": "timestamp",
                 "dataset_file_datetime_dateformat": "YYYY-MM-DD HH:mm:ss",
-                "dataset_file_datetime_time": None,
-                "dataset_file_datetime_timeformat": None,
             }
         )
 
@@ -96,8 +92,6 @@ class Schema3FileDatetimeTests(unittest.TestCase):
                 "dataset_file_datetime_source": "collection",
                 "dataset_file_datetime_date": "2026-07-13",
                 "dataset_file_datetime_dateformat": "YYYY-MM-DD",
-                "dataset_file_datetime_time": None,
-                "dataset_file_datetime_timeformat": None,
             }
         )
 
@@ -124,7 +118,7 @@ class Schema3FileDatetimeTests(unittest.TestCase):
 
         errors = self.schema_errors(metadata)
 
-        self.assertTrue(any("is not of type 'null'" in error["message"] for error in errors))
+        self.assertTrue(errors)
 
     def test_parses_column_and_collection_sources(self):
         column_timestamps, column_errors, checked, config_errors = parse_timestamps_from_rows(

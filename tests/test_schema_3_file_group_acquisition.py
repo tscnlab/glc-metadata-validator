@@ -20,8 +20,6 @@ class Schema3FileGroupAcquisitionTests(unittest.TestCase):
                 "dataset_file_datetime_source": "collection",
                 "dataset_file_datetime_date": "2026-07-13",
                 "dataset_file_datetime_dateformat": "YYYY-MM-DD",
-                "dataset_file_datetime_time": None,
-                "dataset_file_datetime_timeformat": None,
             }
         )
 

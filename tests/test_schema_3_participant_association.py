@@ -27,23 +27,26 @@ class Schema3ParticipantAssociationTests(unittest.TestCase):
 
         self.assertTrue(self.errors(record))
 
-    def test_non_participant_requires_null_participant_id(self):
+    def test_non_participant_requires_omitted_participant_id(self):
         record = self.record()
         record["dataset_participant_associated"] = False
 
         self.assertTrue(self.errors(record))
 
-        record["dataset_crossref"]["dataset_crossref_participant_id"] = None
+        del record["dataset_crossref"]["dataset_crossref_participant_id"]
         record["dataset_file"][0]["dataset_file_device_location_type"] = "environmental"
         record["dataset_file"][0]["dataset_file_device_location"] = "building rooftop"
         self.assertEqual(self.errors(record), [])
+
+        record["dataset_crossref"]["dataset_crossref_participant_id"] = None
+        self.assertTrue(self.errors(record))
 
     def test_non_participant_rejects_body_worn_or_proximal_location(self):
         for location_type in ("body_worn", "participant_proximal"):
             with self.subTest(location_type=location_type):
                 record = self.record()
                 record["dataset_participant_associated"] = False
-                record["dataset_crossref"]["dataset_crossref_participant_id"] = None
+                del record["dataset_crossref"]["dataset_crossref_participant_id"]
                 record["dataset_file"][0]["dataset_file_device_location_type"] = location_type
 
                 self.assertTrue(self.errors(record))

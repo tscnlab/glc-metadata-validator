@@ -974,6 +974,7 @@ def read_tabular_file(
     max_rows: int = None,
     header_row_hint: int = None,
     declared_headers=None,
+    row_width_issues=None,
 ):
     """
     Read tabular-like file and return (headers, rows_of_dicts, read_error_message_or_None).
@@ -1029,15 +1030,38 @@ def read_tabular_file(
             headers = [str(c).strip() for c in raw_rows[header_idx]]
             data_rows = raw_rows[header_idx + 1:]
             rows = []
+            too_few_rows = []
+            too_many_rows = []
             for i, row in enumerate(data_rows):
                 if max_rows is not None and i >= max_rows:
                     break
                 values = list(row)
                 if len(values) < len(headers):
+                    too_few_rows.append(header_idx + i + 2)
                     values.extend([""] * (len(headers) - len(values)))
                 if len(values) > len(headers):
+                    too_many_rows.append(header_idx + i + 2)
                     values = values[: len(headers)]
                 rows.append(dict(zip(headers, values)))
+            if isinstance(row_width_issues, list):
+                if too_few_rows:
+                    row_width_issues.append(
+                        {
+                            "kind": "too_few",
+                            "count": len(too_few_rows),
+                            "rows": too_few_rows,
+                            "expected": len(headers),
+                        }
+                    )
+                if too_many_rows:
+                    row_width_issues.append(
+                        {
+                            "kind": "too_many",
+                            "count": len(too_many_rows),
+                            "rows": too_many_rows,
+                            "expected": len(headers),
+                        }
+                    )
             return headers, rows, None
     except Exception as e:
         return [], [], str(e)
@@ -1506,12 +1530,14 @@ def validate_dataset_file_content(dataset_rows, package: Package, base_path: str
                     )
                     continue
 
+                row_width_issues = []
                 headers, data_rows, read_error = read_tabular_file(
                     resolved,
                     format_hint=file_format,
                     encoding_hint=encoding_hint,
                     header_row_hint=header_row_hint if isinstance(header_row_hint, int) else None,
                     declared_headers=declared_col_names,
+                    row_width_issues=row_width_issues,
                 )
                 if read_error:
                     errors.append(
@@ -1521,6 +1547,30 @@ def validate_dataset_file_content(dataset_rows, package: Package, base_path: str
                         }
                     )
                     continue
+
+                for issue in row_width_issues:
+                    direction = "fewer" if issue["kind"] == "too_few" else "more"
+                    handling = (
+                        "missing trailing cells were treated as empty"
+                        if issue["kind"] == "too_few"
+                        else "surplus cells were ignored"
+                    )
+                    example_rows = issue["rows"][:10]
+                    example_suffix = (
+                        ""
+                        if issue["count"] <= len(example_rows)
+                        else f" (first {len(example_rows)} shown)"
+                    )
+                    warnings.append(
+                        {
+                            "message": (
+                                f"{label} File '{file_name}' has {issue['count']} data row(s) with "
+                                f"{direction} cells than the {issue['expected']}-column header; "
+                                f"{handling}. Rows: {example_rows}{example_suffix}"
+                            ),
+                            "path": ["dataset_file", j, "dataset_file_names", f_idx],
+                        }
+                    )
 
                 # Column checks
                 missing_declared = [c for c in declared_col_names if c not in headers]

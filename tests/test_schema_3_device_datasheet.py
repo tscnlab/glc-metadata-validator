@@ -20,14 +20,11 @@ def light_datasheet():
         "datasheet_manufacturer": "Lumitech",
         "datasheet_type": "Wearable light sensor",
         "datasheet_sensor_modality": ["light"],
-        "datasheet_sensor_modality_other": None,
         "datasheet_model": "LT-100",
         "datasheet_calibration_interval": 365,
         "datasheet_calibration_method": "Reference lamp comparison",
         "datasheet_calibration_accuracy": "+/-2%",
         "datasheet_calibration_range": "0-100,000 lux",
-        "datasheet_calibration_notes": None,
-        "datasheet_calibration_parameters": None,
         "datasheet_calibration_spectral_sensitivity": [
             {
                 "datasheet_calibration_spectral_sensitivity_wavelength": 555,
@@ -73,7 +70,7 @@ class Schema3DeviceDatasheetTests(unittest.TestCase):
         datasheet["datasheet_id"] = "example-accelerometer-v1.0"
         datasheet["datasheet_type"] = "Tri-axial accelerometer"
         datasheet["datasheet_sensor_modality"] = ["accelerometer"]
-        datasheet["datasheet_calibration_interval"] = None
+        del datasheet["datasheet_calibration_interval"]
         datasheet["datasheet_calibration_parameters"] = [
             {
                 "parameter_name": "measurement_range",
@@ -103,7 +100,6 @@ class Schema3DeviceDatasheetTests(unittest.TestCase):
     def test_requires_description_for_other_modality(self):
         datasheet = light_datasheet()
         datasheet["datasheet_sensor_modality"] = ["other"]
-        del datasheet["datasheet_sensor_modality_other"]
         for field in [
             "datasheet_calibration_spectral_sensitivity",
             "datasheet_calibration_linearity",

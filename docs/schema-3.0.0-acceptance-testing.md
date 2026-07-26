@@ -28,7 +28,7 @@ warning_count: 0
 
 This verifies the browser importer, builder state mapping, metadata export, bundled schema paths, validator schema validation, cross-resource checks, and data-file content validation together.
 
-The automated suite also covers valid and invalid alternatives that cannot coexist in one package, including participant and non-participant datasets, raw and processed files, fixed-interval and event-based timing, sensor and non-device modalities, column and collection datetime sources, all declared variable types, nullable core-resource fields, contributor requirements, participant constraints, and participant-characteristic foreign keys.
+The automated suite also covers valid and invalid alternatives that cannot coexist in one package, including participant and non-participant datasets, raw and processed files, fixed-interval and event-based timing, sensor and non-device modalities, column and collection datetime sources, all declared variable types, omission of unavailable optional metadata, contributor requirements, participant constraints, and participant-characteristic foreign keys.
 
 ## Testing a real dataset package
 

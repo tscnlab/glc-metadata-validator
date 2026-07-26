@@ -10,8 +10,7 @@
     "device_datasheet_id": "lumitech-lt100-v1.0",
     "device_sensors": [
       {
-        "device_sensor_type": "photopic light sensor",
-        "device_sensor_datasheet_id": null
+        "device_sensor_type": "photopic light sensor"
       }
     ]
   }

@@ -9,7 +9,7 @@ A dataset record represents one participant or one non-participant collection co
 `dataset_participant_associated` explicitly declares whether the dataset concerns a participant:
 
 - `true` requires one valid dataset-level participant ID.
-- `false` requires the participant ID to be `null` and is intended for data with no participant association, such as purely environmental monitoring.
+- `false` requires the participant ID property to be omitted and is intended for data with no participant association, such as purely environmental monitoring.
 
 Any `body_worn` or `participant_proximal` file group requires `dataset_participant_associated: true`. A participant-associated dataset does not need a body-worn device; for example, a questionnaire-only dataset is still participant associated.
 
