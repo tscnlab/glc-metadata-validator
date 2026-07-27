@@ -52,8 +52,8 @@ documented in
 - [x] Increment the validator application version to 0.5.1.
 - [x] Build and test the 0.5.1 release-candidate container image locally.
 - [ ] Update the dataset workflow template to use the 0.5.1 reusable workflow.
-- [ ] Publish `ghcr.io/tscnlab/glc-validator:0.5.1`.
-- [ ] Pin the released image digest in the reusable workflow.
+- [x] Publish `ghcr.io/tscnlab/glc-validator:0.5.1`.
+- [x] Pin the released image digest in the reusable workflow (`sha256:a41be6eca235b0b9c15e75f7688a01ba58bae2d7366ac35ca0e4380a227e87fe`).
 - [ ] Tag and publish validator release v0.5.1.
 - [ ] Run validation, attestation, registry-ingestion, viewer, and
   LightLogWeb handoff checks.
