@@ -13,7 +13,7 @@ import glc_validator
 FIXTURE_ROOT = os.path.join(
     os.path.dirname(__file__),
     "fixtures",
-    "schema-3.0.0",
+    "schema-3.0.1",
     "pass",
 )
 
@@ -49,7 +49,7 @@ class Schema3PackageFixtureTests(unittest.TestCase):
 
         self.assertEqual(exit_code, 0, report["errors"])
         self.assertEqual(report["status"], "pass")
-        self.assertEqual(report["schema_version"], "3.0.0")
+        self.assertEqual(report["schema_version"], "3.0.1")
         self.assertEqual(report["error_count"], 0)
         self.assertNotIn("column_check_mode", report)
         self.assertEqual(manifest["schema_version"], "1.0")
@@ -114,6 +114,25 @@ class Schema3PackageFixtureTests(unittest.TestCase):
         self.assertEqual(exit_code, 1)
         self.assertTrue(any("missing declared columns" in message for message in messages))
         self.assertTrue(any("datetime values that do not match" in message for message in messages))
+
+    def test_inconsistent_data_row_widths_generate_warnings(self):
+        def add_inconsistent_rows(package_root):
+            data_path = os.path.join(package_root, "data", "datasets", "light.csv")
+            with open(data_path, "w", encoding="utf-8") as data_file:
+                data_file.write(
+                    "Device export,Lumitech LT-100\n"
+                    "Generated for schema test,2026-07-16\n"
+                    "timestamp,illuminance\n"
+                    "2026-07-14 08:00:00\n"
+                    "2026-07-14 08:01:00,13.0,surplus\n"
+                )
+
+        exit_code, report, _ = self.validate_fixture(mutate=add_inconsistent_rows)
+        warning_messages = [warning["message"] for warning in report["warnings"]]
+
+        self.assertEqual(exit_code, 0, report["errors"])
+        self.assertTrue(any("fewer cells than" in message for message in warning_messages))
+        self.assertTrue(any("more cells than" in message for message in warning_messages))
 
     def test_cross_resource_ids_are_checked_end_to_end(self):
         def invalidate_crossrefs(package_root):

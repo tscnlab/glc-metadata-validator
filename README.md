@@ -10,8 +10,8 @@ This repository contains the GLC metadata validator for GLC Frictionless data pa
 - `Dockerfile`: a containerized runtime for running validation consistently in local development and CI.
 - `requirements.txt`: pinned Python dependencies used by the validator.
 - `VERSION`: the validator release version.
-- `schemas/1.0.0/`, `schemas/2.0.0/`, and `schemas/3.0.0/`: supported GLC schema bundles, including the Frictionless data package profile and JSON/Table Schema files for core resources.
-- `docs/schema-3.0.0-development.md`: the implementation and release checklist for coordinating schema, validator, and builder changes.
+- `schemas/1.0.0/`, `schemas/2.0.0/`, `schemas/3.0.0/`, and `schemas/3.0.1/`: supported GLC schema bundles, including the Frictionless data package profile and JSON/Table Schema files for core resources.
+- `docs/schema-3.0.1-development.md`: the corrective-release checklist for coordinating schema, validator, builder, viewer, and dataset changes.
 - `.github/workflows/validate.yml`: a reusable trusted validation workflow that runs the validator container, uploads reports, and attests the validation outputs.
 - `templates/github-actions/validate-glc-dataset.yml`: a ready-to-copy caller workflow for dataset repositories.
 
@@ -110,7 +110,7 @@ Registry automation should verify the attested `validation-report` artifact for 
 The workflow uses:
 
 ```text
-ghcr.io/tscnlab/glc-validator:0.5.0
+ghcr.io/tscnlab/glc-validator:0.5.1
 ```
 
 For local validation without GitHub Actions, run the same container from the repository that contains `datapackage.json`:
@@ -119,13 +119,13 @@ For local validation without GitHub Actions, run the same container from the rep
 docker run --rm \
   -v "$PWD":/data \
   -w /data \
-  ghcr.io/tscnlab/glc-validator:0.5.0 \
+  ghcr.io/tscnlab/glc-validator:0.5.1 \
   datapackage.json
 ```
 
 ## Expected package shape
 
-The metadata repository should include a `datapackage.json` with a supported `schema_version`, currently `1.0.0`, `2.0.0`, or `3.0.0`. The package must declare the required core resources using the canonical resource names:
+The metadata repository should include a `datapackage.json` with a supported `schema_version`, currently `1.0.0`, `2.0.0`, `3.0.0`, or `3.0.1`. New packages should use `3.0.1`; `3.0.0` remains supported for reproducibility of packages validated against the published release. The package must declare the required core resources using the canonical resource names:
 
 - `study`
 - `participants`

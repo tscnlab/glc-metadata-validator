@@ -400,8 +400,8 @@ def warn_unreferenced_participant_ids(dataset_rows, participant_table):
 
 
 def validate_dataset_timezones(dataset_rows, schema_version):
-    """Validate 3.0.0 dataset and file-group timezone values against the IANA database."""
-    if schema_version != "3.0.0":
+    """Validate schema 3 dataset and file-group timezone values against the IANA database."""
+    if schema_version not in SCHEMA_3_VERSIONS:
         return []
 
     try:
@@ -716,7 +716,9 @@ def validate_primary_variables_subset(dataset_rows, warnings=None):
                 continue
 
             requires_primary_variables = (
-                file_role == "primary" if schema_version == "3.0.0" else is_auxiliary is False
+                file_role == "primary"
+                if schema_version in SCHEMA_3_VERSIONS
+                else is_auxiliary is False
             )
             if requires_primary_variables and len(primary_variables) == 0:
                 errors.append(
@@ -725,7 +727,7 @@ def validate_primary_variables_subset(dataset_rows, warnings=None):
                             f"[dataset {dataset_label} file {j+1}] primary_variables is required and must be non-empty "
                             + (
                                 "when dataset_file_role is primary"
-                                if schema_version == "3.0.0"
+                                if schema_version in SCHEMA_3_VERSIONS
                                 else "when dataset_file_auxiliary is false"
                             )
                         ),
@@ -735,7 +737,7 @@ def validate_primary_variables_subset(dataset_rows, warnings=None):
                 continue
 
             if (
-                schema_version != "3.0.0"
+                schema_version not in SCHEMA_3_VERSIONS
                 and is_auxiliary is True
                 and "primary_variables" in file_obj
                 and len(primary_variables) > 0
@@ -974,6 +976,7 @@ def read_tabular_file(
     max_rows: int = None,
     header_row_hint: int = None,
     declared_headers=None,
+    row_width_issues=None,
 ):
     """
     Read tabular-like file and return (headers, rows_of_dicts, read_error_message_or_None).
@@ -1029,15 +1032,38 @@ def read_tabular_file(
             headers = [str(c).strip() for c in raw_rows[header_idx]]
             data_rows = raw_rows[header_idx + 1:]
             rows = []
+            too_few_rows = []
+            too_many_rows = []
             for i, row in enumerate(data_rows):
                 if max_rows is not None and i >= max_rows:
                     break
                 values = list(row)
                 if len(values) < len(headers):
+                    too_few_rows.append(header_idx + i + 2)
                     values.extend([""] * (len(headers) - len(values)))
                 if len(values) > len(headers):
+                    too_many_rows.append(header_idx + i + 2)
                     values = values[: len(headers)]
                 rows.append(dict(zip(headers, values)))
+            if isinstance(row_width_issues, list):
+                if too_few_rows:
+                    row_width_issues.append(
+                        {
+                            "kind": "too_few",
+                            "count": len(too_few_rows),
+                            "rows": too_few_rows,
+                            "expected": len(headers),
+                        }
+                    )
+                if too_many_rows:
+                    row_width_issues.append(
+                        {
+                            "kind": "too_many",
+                            "count": len(too_many_rows),
+                            "rows": too_many_rows,
+                            "expected": len(headers),
+                        }
+                    )
             return headers, rows, None
     except Exception as e:
         return [], [], str(e)
@@ -1506,12 +1532,14 @@ def validate_dataset_file_content(dataset_rows, package: Package, base_path: str
                     )
                     continue
 
+                row_width_issues = []
                 headers, data_rows, read_error = read_tabular_file(
                     resolved,
                     format_hint=file_format,
                     encoding_hint=encoding_hint,
                     header_row_hint=header_row_hint if isinstance(header_row_hint, int) else None,
                     declared_headers=declared_col_names,
+                    row_width_issues=row_width_issues,
                 )
                 if read_error:
                     errors.append(
@@ -1521,6 +1549,30 @@ def validate_dataset_file_content(dataset_rows, package: Package, base_path: str
                         }
                     )
                     continue
+
+                for issue in row_width_issues:
+                    direction = "fewer" if issue["kind"] == "too_few" else "more"
+                    handling = (
+                        "missing trailing cells were treated as empty"
+                        if issue["kind"] == "too_few"
+                        else "surplus cells were ignored"
+                    )
+                    example_rows = issue["rows"][:10]
+                    example_suffix = (
+                        ""
+                        if issue["count"] <= len(example_rows)
+                        else f" (first {len(example_rows)} shown)"
+                    )
+                    warnings.append(
+                        {
+                            "message": (
+                                f"{label} File '{file_name}' has {issue['count']} data row(s) with "
+                                f"{direction} cells than the {issue['expected']}-column header; "
+                                f"{handling}. Rows: {example_rows}{example_suffix}"
+                            ),
+                            "path": ["dataset_file", j, "dataset_file_names", f_idx],
+                        }
+                    )
 
                 # Column checks
                 missing_declared = [c for c in declared_col_names if c not in headers]
@@ -1543,7 +1595,7 @@ def validate_dataset_file_content(dataset_rows, package: Package, base_path: str
                         }
                     )
 
-                if schema_version == "3.0.0":
+                if schema_version in SCHEMA_3_VERSIONS:
                     errors += validate_declared_column_values(
                         data_rows,
                         declared_vars,
@@ -1555,7 +1607,7 @@ def validate_dataset_file_content(dataset_rows, package: Package, base_path: str
                     )
 
                 # Datetime metadata checks
-                uses_file_group_datetime = schema_version == "3.0.0"
+                uses_file_group_datetime = schema_version in SCHEMA_3_VERSIONS
                 dt_meta = (
                     file_obj.get("dataset_file_datetime", {})
                     if uses_file_group_datetime
@@ -1618,9 +1670,9 @@ def validate_dataset_file_content(dataset_rows, package: Package, base_path: str
                         }
                     )
 
-                # Legacy wearable-vs-auxiliary heuristic. Role in 3.0.0 does not imply modality.
+                # Legacy wearable-vs-auxiliary heuristic. Schema 3 role does not imply modality.
                 reg = regularity_ratio(timestamps)
-                if schema_version != "3.0.0" and is_aux is False:
+                if schema_version not in SCHEMA_3_VERSIONS and is_aux is False:
                     if len(data_rows) < 2:
                         warnings.append(
                             {
@@ -1638,7 +1690,7 @@ def validate_dataset_file_content(dataset_rows, package: Package, base_path: str
                                 "path": ["dataset_file", j],
                             }
                         )
-                elif schema_version != "3.0.0" and is_aux is True:
+                elif schema_version not in SCHEMA_3_VERSIONS and is_aux is True:
                     if reg is not None and reg >= 0.9 and len(timestamps) >= 20:
                         warnings.append(
                             {
@@ -1657,7 +1709,8 @@ def validate_dataset_file_content(dataset_rows, package: Package, base_path: str
 # ----------------------------
 VALIDATOR_ROOT = Path(__file__).parent.resolve()
 CANONICAL_SCHEMAS_DIR = VALIDATOR_ROOT / "schemas"
-SUPPORTED_SCHEMA_VERSIONS = {"1.0.0", "2.0.0", "3.0.0"}
+SCHEMA_3_VERSIONS = {"3.0.0", "3.0.1"}
+SUPPORTED_SCHEMA_VERSIONS = {"1.0.0", "2.0.0"} | SCHEMA_3_VERSIONS
 
 CORE_JSON_RESOURCES = {"study", "datasets", "devices", "device_datasheets"}
 CORE_TABULAR_RESOURCES = {"participants", "participant_characteristics"}
@@ -1690,7 +1743,7 @@ def get_core_tabular_schema_path(resource_name: str, schema_version: str) -> Pat
 def get_profile_path(schema_version: str) -> Path:
     profile_filename = (
         "glc-dp-profile.json"
-        if schema_version == "3.0.0"
+        if schema_version in SCHEMA_3_VERSIONS
         else "gleam-dp-profile.json"
     )
     return get_versioned_schema_dir(schema_version) / profile_filename
@@ -1786,7 +1839,7 @@ def validate_crossrefs(datapackage_path: str):
         if schema_version:
             profile_filename = (
                 "glc-dp-profile.json"
-                if schema_version == "3.0.0"
+                if schema_version in SCHEMA_3_VERSIONS
                 else "gleam-dp-profile.json"
             )
             allowed_profiles.add(f"schemas/{schema_version}/{profile_filename}")

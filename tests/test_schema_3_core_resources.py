@@ -6,8 +6,8 @@ from glc_validator import validate_against_json_schema
 
 
 ROOT = os.path.dirname(os.path.dirname(__file__))
-SCHEMAS = os.path.join(ROOT, "schemas", "3.0.0")
-FIXTURE_DATA = os.path.join(ROOT, "tests", "fixtures", "schema-3.0.0", "pass", "data")
+SCHEMAS = os.path.join(ROOT, "schemas", "3.0.1")
+FIXTURE_DATA = os.path.join(ROOT, "tests", "fixtures", "schema-3.0.1", "pass", "data")
 
 
 class Schema3CoreResourceTests(unittest.TestCase):
@@ -26,7 +26,7 @@ class Schema3CoreResourceTests(unittest.TestCase):
         studies = self.load_json("study.json")
         self.assertEqual(self.schema_errors(studies, "study.schema.json", "study"), [])
 
-    def test_study_allows_nullable_optional_sections(self):
+    def test_study_optional_sections_must_be_omitted_instead_of_null(self):
         study = self.load_json("study.json")[0]
         for field in (
             "study_preregistration",
@@ -40,6 +40,20 @@ class Schema3CoreResourceTests(unittest.TestCase):
             "study_keywords",
         ):
             study[field] = None
+        self.assertTrue(self.schema_errors([study], "study.schema.json", "study"))
+
+        for field in (
+            "study_preregistration",
+            "study_ethics",
+            "study_registration",
+            "study_groups",
+            "study_intervention",
+            "study_contributors",
+            "study_type",
+            "study_funding_sources",
+            "study_keywords",
+        ):
+            del study[field]
         self.assertEqual(self.schema_errors([study], "study.schema.json", "study"), [])
 
     def test_contributor_institution_requires_name_and_country(self):
@@ -48,10 +62,14 @@ class Schema3CoreResourceTests(unittest.TestCase):
         errors = self.schema_errors([study], "study.schema.json", "study")
         self.assertTrue(any("contributor_institution_country" in error["message"] for error in errors))
 
-    def test_device_optional_firmware_and_sensors_may_be_null(self):
+    def test_device_optional_firmware_and_sensors_must_be_omitted_instead_of_null(self):
         device = self.load_json("devices.json")[0]
         device["device_firmware_version"] = None
         device["device_sensors"] = None
+        self.assertTrue(self.schema_errors([device], "device.schema.json", "devices"))
+
+        del device["device_firmware_version"]
+        del device["device_sensors"]
         self.assertEqual(self.schema_errors([device], "device.schema.json", "devices"), [])
 
     def test_device_sensor_requires_type_and_rejects_unknown_fields(self):
@@ -64,10 +82,13 @@ class Schema3CoreResourceTests(unittest.TestCase):
         errors = self.schema_errors([device], "device.schema.json", "devices")
         self.assertTrue(any("Additional properties" in error["message"] for error in errors))
 
-    def test_device_calibration_date_accepts_null_and_rejects_bad_shape(self):
+    def test_device_calibration_date_is_required_and_rejects_null_and_bad_shape(self):
         device = self.load_json("devices.json")[0]
         device["device_calibration_date"] = None
-        self.assertEqual(self.schema_errors([device], "device.schema.json", "devices"), [])
+        self.assertTrue(self.schema_errors([device], "device.schema.json", "devices"))
+
+        del device["device_calibration_date"]
+        self.assertTrue(self.schema_errors([device], "device.schema.json", "devices"))
 
         device["device_calibration_date"] = "16-07-2026"
         self.assertTrue(self.schema_errors([device], "device.schema.json", "devices"))

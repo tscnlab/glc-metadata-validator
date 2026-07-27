@@ -8,7 +8,7 @@ from test_schema_3_file_datetime import dataset_record
 SCHEMA_PATH = os.path.join(
     os.path.dirname(os.path.dirname(__file__)),
     "schemas",
-    "3.0.0",
+    "3.0.1",
     "dataset.schema.json",
 )
 
@@ -18,8 +18,6 @@ def collection_datetime():
         "dataset_file_datetime_source": "collection",
         "dataset_file_datetime_date": "2026-07-14",
         "dataset_file_datetime_dateformat": "YYYY-MM-DD",
-        "dataset_file_datetime_time": None,
-        "dataset_file_datetime_timeformat": None,
     }
 
 

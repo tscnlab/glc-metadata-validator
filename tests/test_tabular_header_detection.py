@@ -53,6 +53,35 @@ class TabularHeaderDetectionTests(unittest.TestCase):
 
         self.assertIn("out of range", error)
 
+    def test_row_width_issues_are_aggregated_while_rows_remain_readable(self):
+        path = self.make_file(
+            "timestamp,illuminance,temperature\n"
+            "2026-07-16 08:00:00,10.5\n"
+            "2026-07-16 08:01:00,11.0,22.1,ignored\n"
+            "2026-07-16 08:02:00,12.0,22.2\n"
+        )
+        row_width_issues = []
+
+        headers, rows, error = read_tabular_file(
+            path,
+            "csv",
+            "utf-8",
+            declared_headers=["timestamp", "illuminance", "temperature"],
+            row_width_issues=row_width_issues,
+        )
+
+        self.assertIsNone(error)
+        self.assertEqual(headers, ["timestamp", "illuminance", "temperature"])
+        self.assertEqual(rows[0]["temperature"], "")
+        self.assertNotIn("ignored", rows[1].values())
+        self.assertEqual(
+            row_width_issues,
+            [
+                {"kind": "too_few", "count": 1, "rows": [2], "expected": 3},
+                {"kind": "too_many", "count": 1, "rows": [3], "expected": 3},
+            ],
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
