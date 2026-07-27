@@ -39,9 +39,9 @@ documented in
 
 ## Coordinated repository work
 
-- [ ] Update the metadata builder to create 3.0.1 packages and stop offering
+- [x] Update the metadata builder to create 3.0.1 packages and stop offering
   3.0.0 for new package creation.
-- [ ] Update the viewer documentation, downloads, examples, and validation
+- [x] Update the viewer documentation, downloads, examples, and validation
   guide from 3.0.0 to 3.0.1.
 - [ ] Migrate and revalidate the MeLiDos IZTECH package as 3.0.1.
 - [ ] Set the registry's current schema version to 3.0.1 while retaining
@@ -49,8 +49,8 @@ documented in
 
 ## Application release work
 
-- [ ] Increment the validator application version to 0.5.1.
-- [ ] Build and test the 0.5.1 container image.
+- [x] Increment the validator application version to 0.5.1.
+- [x] Build and test the 0.5.1 release-candidate container image locally.
 - [ ] Update the dataset workflow template to use the 0.5.1 reusable workflow.
 - [ ] Publish `ghcr.io/tscnlab/glc-validator:0.5.1`.
 - [ ] Pin the released image digest in the reusable workflow.

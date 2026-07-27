@@ -110,7 +110,7 @@ Registry automation should verify the attested `validation-report` artifact for 
 The workflow uses:
 
 ```text
-ghcr.io/tscnlab/glc-validator:0.5.0
+ghcr.io/tscnlab/glc-validator:0.5.1
 ```
 
 For local validation without GitHub Actions, run the same container from the repository that contains `datapackage.json`:
@@ -119,7 +119,7 @@ For local validation without GitHub Actions, run the same container from the rep
 docker run --rm \
   -v "$PWD":/data \
   -w /data \
-  ghcr.io/tscnlab/glc-validator:0.5.0 \
+  ghcr.io/tscnlab/glc-validator:0.5.1 \
   datapackage.json
 ```
 
