@@ -11,14 +11,14 @@ from glc_validator import (
 SCHEMA_PATH = os.path.join(
     os.path.dirname(os.path.dirname(__file__)),
     "schemas",
-    "3.0.0",
+    "3.0.1",
     "dataset.schema.json",
 )
 
 
 def dataset_record(datetime_metadata):
     return {
-        "schema_version": "3.0.0",
+        "schema_version": "3.0.1",
         "dataset_internal_id": "DS001",
         "dataset_participant_associated": True,
         "dataset_crossref": {

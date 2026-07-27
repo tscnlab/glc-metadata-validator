@@ -8,11 +8,14 @@
     "datasheet_sensor_modality": [
       "light"
     ],
+    "datasheet_sensor_modality_other": null,
     "datasheet_model": "LT-100",
     "datasheet_calibration_interval": 365,
     "datasheet_calibration_method": "Reference lamp comparison",
     "datasheet_calibration_accuracy": "+/-2%",
     "datasheet_calibration_range": "0-100,000 lux",
+    "datasheet_calibration_notes": null,
+    "datasheet_calibration_parameters": null,
     "datasheet_calibration_spectral_sensitivity": [
       {
         "datasheet_calibration_spectral_sensitivity_wavelength": 555,

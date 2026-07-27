@@ -8,7 +8,7 @@ from tests.test_schema_3_file_datetime import dataset_record
 SCHEMA_PATH = os.path.join(
     os.path.dirname(os.path.dirname(__file__)),
     "schemas",
-    "3.0.0",
+    "3.0.1",
     "dataset.schema.json",
 )
 

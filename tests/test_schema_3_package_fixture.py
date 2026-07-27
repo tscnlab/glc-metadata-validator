@@ -13,7 +13,7 @@ import glc_validator
 FIXTURE_ROOT = os.path.join(
     os.path.dirname(__file__),
     "fixtures",
-    "schema-3.0.0",
+    "schema-3.0.1",
     "pass",
 )
 
@@ -49,7 +49,7 @@ class Schema3PackageFixtureTests(unittest.TestCase):
 
         self.assertEqual(exit_code, 0, report["errors"])
         self.assertEqual(report["status"], "pass")
-        self.assertEqual(report["schema_version"], "3.0.0")
+        self.assertEqual(report["schema_version"], "3.0.1")
         self.assertEqual(report["error_count"], 0)
         self.assertNotIn("column_check_mode", report)
         self.assertEqual(manifest["schema_version"], "1.0")

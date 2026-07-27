@@ -8,100 +8,77 @@
   "properties": {
     "schema_version": {
       "type": "string",
-      "description": "Version of the metadata schema used by this device record",
-      "examples": [
-        "3.0.0"
-      ]
+      "description": "Version of the metadata schema used by this device record"
     },
     "device_internal_id": {
       "type": "string",
-      "description": "Unique internal identifier for the device",
-      "examples": [
-        "EXAMPLE_DEVICE_001"
-      ]
+      "description": "Unique internal identifier for the device"
     },
     "device_manufacturer": {
       "type": "string",
-      "description": "Manufacturer of the device",
-      "examples": [
-        "Example Instruments"
-      ]
+      "description": "Manufacturer of the device"
     },
     "device_model": {
       "type": "string",
-      "description": "Model name or number of the device",
-      "examples": [
-        "Light Sensor LS-100"
-      ]
+      "description": "Model name or number of the device"
     },
     "device_serial_number": {
       "type": "string",
-      "description": "Serial number assigned to the individual device",
-      "examples": [
-        "LS100-0001"
-      ]
+      "description": "Serial number assigned to the individual device"
     },
     "device_calibration_date": {
-      "type": "string",
-      "format": "date",
-      "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
-      "description": "Required date of the device's most recent applicable calibration (format YYYY-MM-DD).",
-      "examples": [
-        "2026-01-15"
+      "description": "Date of last calibration (format YYYY-MM-DD), or null when unknown/not available",
+      "oneOf": [
+        {
+          "type": "string",
+          "format": "date",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+        },
+        {
+          "type": "null"
+        }
       ]
     },
     "device_firmware_version": {
-      "type": "string",
-      "description": "Firmware version installed on the device",
-      "examples": [
-        "1.2.0"
-      ]
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Firmware version installed on the device"
     },
     "device_datasheet_id": {
       "type": "string",
       "pattern": "^[a-z0-9][a-z0-9._-]*(-v[0-9]+(\\.[0-9]+)*)?$",
-      "description": "Reference to the general device specifications. Datasheet ID (slug). Version suffix optional; e.g., lumitech-lt100-v1.0",
-      "examples": [
-        "example-instruments-ls100-v1"
-      ]
+      "description": "Reference to the general device specifications. Datasheet ID (slug). Version suffix optional; e.g., lumitech-lt100-v1.0"
     },
     "device_sensors": {
-      "type": "array",
-      "description": "List of sensors contained within the device",
-      "default": [
-
+      "type": [
+        "array",
+        "null"
       ],
+      "description": "List of sensors contained within the device",
+      "default": [],
       "items": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
           "device_sensor_type": {
             "type": "string",
-            "description": "Type of sensor (e.g., photopic light sensor, UV sensor)",
-            "examples": [
-              "photopic light sensor"
-            ]
+            "description": "Type of sensor (e.g., photopic light sensor, UV sensor)"
           },
-      "device_sensor_datasheet_id": {
-        "type": "string",
-        "pattern": "^[a-z0-9][a-z0-9._-]*(-v[0-9]+(\\.[0-9]+)*)?$",
-        "description": "Optional reference to a separate detailed datasheet for this sensor component. Omit when the required whole-device datasheet covers the integrated sensor.",
-        "examples": [
-          "example-instruments-ls100-v1"
-        ]
+          "device_sensor_datasheet_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^[a-z0-9][a-z0-9._-]*(-v[0-9]+(\\.[0-9]+)*)?$",
+            "description": "Reference to detailed datasheet of the sensor"
           }
         },
         "required": [
           "device_sensor_type"
         ]
-      },
-      "examples": [
-        [
-          {
-            "device_sensor_type": "photopic light sensor"
-          }
-        ]
-      ]
+      }
     }
   },
   "required": [
@@ -130,5 +107,5 @@
       ]
     }
   ],
-  "$comment": "Missing-value convention: Optional properties with no value must be omitted rather than represented as null, an empty string, or an empty array."
+  "$comment": "Missing-value convention: Optional properties with no value should be omitted rather than represented as null, an empty string, or an empty array. Required properties must remain present and satisfy their schema, including where null is explicitly permitted."
 }

@@ -6,8 +6,8 @@ from glc_validator import validate_against_json_schema
 
 
 ROOT = os.path.dirname(os.path.dirname(__file__))
-SCHEMAS = os.path.join(ROOT, "schemas", "3.0.0")
-FIXTURE_DATA = os.path.join(ROOT, "tests", "fixtures", "schema-3.0.0", "pass", "data")
+SCHEMAS = os.path.join(ROOT, "schemas", "3.0.1")
+FIXTURE_DATA = os.path.join(ROOT, "tests", "fixtures", "schema-3.0.1", "pass", "data")
 
 
 class Schema3CoreResourceTests(unittest.TestCase):

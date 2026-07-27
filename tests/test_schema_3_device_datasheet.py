@@ -7,14 +7,14 @@ from glc_validator import validate_against_json_schema
 SCHEMA_PATH = os.path.join(
     os.path.dirname(os.path.dirname(__file__)),
     "schemas",
-    "3.0.0",
+    "3.0.1",
     "device_datasheet.schema.json",
 )
 
 
 def light_datasheet():
     return {
-        "schema_version": "3.0.0",
+        "schema_version": "3.0.1",
         "datasheet_id": "lumitech-lt100-v1.0",
         "datasheet_version": "1.0",
         "datasheet_manufacturer": "Lumitech",

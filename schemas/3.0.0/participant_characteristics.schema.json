@@ -6,31 +6,27 @@
     {
       "name": "participant_internal_id",
       "type": "string",
-      "description": "Linked participant ID",
-      "example": "EXAMPLE_P001"
+      "description": "Linked participant ID"
     },
     {
       "name": "participant_characteristic_name",
       "type": "string",
-      "description": "Name of the participant characteristic",
-      "example": "chronotype"
+      "description": "Name of the participant characteristic"
     },
     {
       "name": "participant_characteristic_value",
       "type": "string",
-      "description": "Value of the participant characteristic",
-      "example": "intermediate"
+      "description": "Value of the participant characteristic"
     },
     {
       "name": "participant_characteristic_unit",
       "type": "string",
-      "description": "Optional unit of the characteristic value. Leave blank for unitless scores or categorical values."
+      "description": "Unit of the characteristic value"
     },
     {
       "name": "participant_characteristic_description",
       "type": "string",
-      "description": "Additional notes or description",
-      "example": "Self-reported chronotype category."
+      "description": "Additional notes or description"
     }
   ],
   "primaryKey": [

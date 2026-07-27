@@ -400,8 +400,8 @@ def warn_unreferenced_participant_ids(dataset_rows, participant_table):
 
 
 def validate_dataset_timezones(dataset_rows, schema_version):
-    """Validate 3.0.0 dataset and file-group timezone values against the IANA database."""
-    if schema_version != "3.0.0":
+    """Validate schema 3 dataset and file-group timezone values against the IANA database."""
+    if schema_version not in SCHEMA_3_VERSIONS:
         return []
 
     try:
@@ -716,7 +716,9 @@ def validate_primary_variables_subset(dataset_rows, warnings=None):
                 continue
 
             requires_primary_variables = (
-                file_role == "primary" if schema_version == "3.0.0" else is_auxiliary is False
+                file_role == "primary"
+                if schema_version in SCHEMA_3_VERSIONS
+                else is_auxiliary is False
             )
             if requires_primary_variables and len(primary_variables) == 0:
                 errors.append(
@@ -725,7 +727,7 @@ def validate_primary_variables_subset(dataset_rows, warnings=None):
                             f"[dataset {dataset_label} file {j+1}] primary_variables is required and must be non-empty "
                             + (
                                 "when dataset_file_role is primary"
-                                if schema_version == "3.0.0"
+                                if schema_version in SCHEMA_3_VERSIONS
                                 else "when dataset_file_auxiliary is false"
                             )
                         ),
@@ -735,7 +737,7 @@ def validate_primary_variables_subset(dataset_rows, warnings=None):
                 continue
 
             if (
-                schema_version != "3.0.0"
+                schema_version not in SCHEMA_3_VERSIONS
                 and is_auxiliary is True
                 and "primary_variables" in file_obj
                 and len(primary_variables) > 0
@@ -1593,7 +1595,7 @@ def validate_dataset_file_content(dataset_rows, package: Package, base_path: str
                         }
                     )
 
-                if schema_version == "3.0.0":
+                if schema_version in SCHEMA_3_VERSIONS:
                     errors += validate_declared_column_values(
                         data_rows,
                         declared_vars,
@@ -1605,7 +1607,7 @@ def validate_dataset_file_content(dataset_rows, package: Package, base_path: str
                     )
 
                 # Datetime metadata checks
-                uses_file_group_datetime = schema_version == "3.0.0"
+                uses_file_group_datetime = schema_version in SCHEMA_3_VERSIONS
                 dt_meta = (
                     file_obj.get("dataset_file_datetime", {})
                     if uses_file_group_datetime
@@ -1668,9 +1670,9 @@ def validate_dataset_file_content(dataset_rows, package: Package, base_path: str
                         }
                     )
 
-                # Legacy wearable-vs-auxiliary heuristic. Role in 3.0.0 does not imply modality.
+                # Legacy wearable-vs-auxiliary heuristic. Schema 3 role does not imply modality.
                 reg = regularity_ratio(timestamps)
-                if schema_version != "3.0.0" and is_aux is False:
+                if schema_version not in SCHEMA_3_VERSIONS and is_aux is False:
                     if len(data_rows) < 2:
                         warnings.append(
                             {
@@ -1688,7 +1690,7 @@ def validate_dataset_file_content(dataset_rows, package: Package, base_path: str
                                 "path": ["dataset_file", j],
                             }
                         )
-                elif schema_version != "3.0.0" and is_aux is True:
+                elif schema_version not in SCHEMA_3_VERSIONS and is_aux is True:
                     if reg is not None and reg >= 0.9 and len(timestamps) >= 20:
                         warnings.append(
                             {
@@ -1707,7 +1709,8 @@ def validate_dataset_file_content(dataset_rows, package: Package, base_path: str
 # ----------------------------
 VALIDATOR_ROOT = Path(__file__).parent.resolve()
 CANONICAL_SCHEMAS_DIR = VALIDATOR_ROOT / "schemas"
-SUPPORTED_SCHEMA_VERSIONS = {"1.0.0", "2.0.0", "3.0.0"}
+SCHEMA_3_VERSIONS = {"3.0.0", "3.0.1"}
+SUPPORTED_SCHEMA_VERSIONS = {"1.0.0", "2.0.0"} | SCHEMA_3_VERSIONS
 
 CORE_JSON_RESOURCES = {"study", "datasets", "devices", "device_datasheets"}
 CORE_TABULAR_RESOURCES = {"participants", "participant_characteristics"}
@@ -1740,7 +1743,7 @@ def get_core_tabular_schema_path(resource_name: str, schema_version: str) -> Pat
 def get_profile_path(schema_version: str) -> Path:
     profile_filename = (
         "glc-dp-profile.json"
-        if schema_version == "3.0.0"
+        if schema_version in SCHEMA_3_VERSIONS
         else "gleam-dp-profile.json"
     )
     return get_versioned_schema_dir(schema_version) / profile_filename
@@ -1836,7 +1839,7 @@ def validate_crossrefs(datapackage_path: str):
         if schema_version:
             profile_filename = (
                 "glc-dp-profile.json"
-                if schema_version == "3.0.0"
+                if schema_version in SCHEMA_3_VERSIONS
                 else "gleam-dp-profile.json"
             )
             allowed_profiles.add(f"schemas/{schema_version}/{profile_filename}")

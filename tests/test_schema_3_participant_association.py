@@ -9,7 +9,7 @@ from test_schema_3_file_modality import collection_datetime
 SCHEMA_PATH = os.path.join(
     os.path.dirname(os.path.dirname(__file__)),
     "schemas",
-    "3.0.0",
+    "3.0.1",
     "dataset.schema.json",
 )
 

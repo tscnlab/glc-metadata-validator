@@ -52,7 +52,7 @@ Record each agreed schema change here together with its validator, builder, migr
 - [x] Add timezone tests covering valid names, `UTC`, invalid names, and missing runtime timezone data.
 - [x] Add a complete passing 3.0.0 metadata-package fixture and a failing integration variant.
 - [x] Expand the self-contained fixture with study contributors, participant characteristics, complete optional study metadata, bundled schemas, and a preamble-bearing light data file.
-- [x] Add valid and invalid core-resource tests for contributors, participants, participant characteristics, devices, omitted optional metadata, and tabular header handling.
+- [x] Add valid and invalid core-resource tests for contributors, participants, participant characteristics, devices, nullable alternatives, and tabular header handling.
 - [x] Confirm validation reports identify schema version 3.0.0.
 - [x] Enable `3.0.0` in `SUPPORTED_SCHEMA_VERSIONS` on the unreleased development branch for end-to-end testing.
 
@@ -75,11 +75,7 @@ Record each agreed schema change here together with its validator, builder, migr
 ## Viewer work
 
 - [ ] Connect the viewer to the same canonical, versioned schema source used by the builder and validator.
-- [ ] Update schema documentation rendering for nested objects and arrays, references, combinators, and conditional requirements used by 3.0.0.
-- [x] Audit every 3.0.0 `null` type allowance against the agreed omission
-  convention. Optional unavailable metadata is omitted; the participant ID is
-  conditionally required or forbidden. Device calibration date remains required,
-  matching the published BMC metadata descriptor.
+- [ ] Update schema documentation rendering for nullable types, nested objects and arrays, references, combinators, and conditional requirements used by 3.0.0.
 - [ ] Remove duplicate and obsolete schema copies and legacy GLEAM/Camtrap content.
 - [ ] After the full MeLiDos IZTECH datapackage passes validation, replace the Camtrap example with a compact, valid GLC 3.0.0 fixture derived from IZTECH. Include one representative participant and selected sensor, diary, and questionnaire file groups while preserving the important study, participant, device, datasheet, dataset, and variable relationships. Link the example page to the complete validated IZTECH package and its registry entry, and provide the compact fixture as a downloadable ZIP for documentation and automated tests.
 - [ ] Add automated schema-rendering, link, example-package, and Jekyll build tests.
