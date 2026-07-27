@@ -51,6 +51,14 @@ class Schema3DeviceDatasheetTests(unittest.TestCase):
     def test_accepts_complete_light_datasheet(self):
         self.assertEqual(self.errors(light_datasheet()), [])
 
+    def test_rejects_empty_channel_list(self):
+        datasheet = light_datasheet()
+        datasheet["datasheet_channel"] = []
+
+        errors = self.errors(datasheet)
+
+        self.assertTrue(any("datasheet_channel" in error["path"] for error in errors))
+
     def test_accepts_missing_optional_light_calibration_fields_but_requires_range(self):
         datasheet = light_datasheet()
         del datasheet["datasheet_calibration_spectral_sensitivity"]
