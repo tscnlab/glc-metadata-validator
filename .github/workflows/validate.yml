@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      VALIDATOR_IMAGE_TAG: ghcr.io/tscnlab/glc-validator@sha256:8e2397f65aa82eaa960d2f8f53aed2bb9fdb623e2bec5dbe15df22c17a658877
+      VALIDATOR_IMAGE_TAG: ghcr.io/tscnlab/glc-validator@sha256:d66c9d705e2a59967c5699af55d872b2012d18fb3c9dc611a9837d1c05af6160
 
     steps:
       - name: Checkout dataset repository
