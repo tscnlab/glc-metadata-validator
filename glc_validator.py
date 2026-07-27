@@ -1709,7 +1709,7 @@ def validate_dataset_file_content(dataset_rows, package: Package, base_path: str
 # ----------------------------
 VALIDATOR_ROOT = Path(__file__).parent.resolve()
 CANONICAL_SCHEMAS_DIR = VALIDATOR_ROOT / "schemas"
-SCHEMA_3_VERSIONS = {"3.0.0", "3.0.1"}
+SCHEMA_3_VERSIONS = {"3.0.0", "3.0.1", "3.0.2"}
 SUPPORTED_SCHEMA_VERSIONS = {"1.0.0", "2.0.0"} | SCHEMA_3_VERSIONS
 
 CORE_JSON_RESOURCES = {"study", "datasets", "devices", "device_datasheets"}
